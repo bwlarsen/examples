@@ -389,7 +389,7 @@ def build_dataloader(dataset, batch_size) -> DataLoader:
         dataset=dataset,
         sampler=None,
         batch_size=batch_size,
-        num_workers=num_workers,
+        num_workers=64,
         prefetch_factor=prefetch_factor,
     )
 
