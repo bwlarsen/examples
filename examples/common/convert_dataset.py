@@ -178,7 +178,7 @@ class NoConcatDataset(IterableDataset):
     def __init__(self, dataset_name: str, data_subset: Union[str, None],
                  split: str):
         self.hf_dataset = hf_datasets.load_dataset(path=dataset_name,
-                                                   name=data_subset,
+                                                   data_dir=data_subset,
                                                    split=split)
     
     def __iter__(self) -> Iterable[Dict[str, bytes]]:
