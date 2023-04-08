@@ -374,7 +374,7 @@ def build_dataloader(dataset, batch_size) -> DataLoader:
     # Multiple workers is only supported on linux machines
     if 'linux' in platform.platform().lower():
         #num_workers = min(64, dataset.hf_dataset.n_shards)  # type: ignore
-        num_workers = 8
+        num_workers = 4
     else:
         num_workers = 0
 
