@@ -156,8 +156,17 @@ c4constants.splits['val_small'] = DataSplitConstants(hf_split='validation',
                                                      folder_split='val_small',
                                                      raw_samples=10000,
                                                      truncated_samples=10000)
+stackconstants = DatasetConstants(
+    chars_per_sample=2163,  # Computed over validation set
+    chars_per_token=4  # OpenAI estimate
+)
+stackconstants.splits['train'] = DataSplitConstants(hf_split='train',
+                                                 folder_split='train',
+                                                 raw_samples=None,
+                                                 truncated_samples=None)
 
-CONSTS = {'c4': c4constants, 'the_pile': pileconstants}
+
+CONSTS = {'c4': c4constants, 'the_pile': pileconstants, 'bigcode/the-stack-dedup':stackconstants}
 
 
 class NoConcatDataset(IterableDataset):
@@ -172,11 +181,41 @@ class NoConcatDataset(IterableDataset):
                                                    name=data_subset,
                                                    split=split,
                                                    streaming=True)
-
+    
     def __iter__(self) -> Iterable[Dict[str, bytes]]:
         for sample in self.hf_dataset:
             # convert to bytes to store in MDS binary format
-            yield {'text': sample['text'].encode('utf-8')}
+            yield {'text': sample['content'].encode('utf-8')}
+
+    # def __iter__(self):
+    #     for sample in self.hf_dataset:
+    #         yield {'text': sample['content']}
+            # sample_dict = {'text': sample['content'], 
+            #     'repository_name': sample['max_stars_repo_name'], 
+            #     'path': sample['max_stars_repo_path'], 
+            #     'size': sample['size'], 
+            #     'lang': sample['lang'], 
+            #     'ext': sample['ext'], 
+            #     'avg_line_length': sample['avg_line_length'], 
+            #     'max_line_length': sample['max_line_length'],
+            #     'alphanum_fraction': sample['alphanum_fraction'], 
+            #     'hexsha': sample['hexsha'], 
+            #     'max_stars_count': sample['max_stars_count'],
+            #     'max_forks_count': sample['max_forks_count'], 
+            #     'max_issues_count': sample['max_issues_count'],
+            #     'licenses': sample['max_stars_repo_licenses']}
+            # # Filter out fields with None
+            # for key in sample_dict:
+            #     if sample_dict[key] == None:
+            #         if key in ['avg_line_length', 'alphanum_fraction']:
+            #             sample_dict[key] = -1.0
+            #         elif key in ['size', 'max_stars_count', 'max_forks_count', 'max_issues_count' 'max_line_length']:
+            #             sample_dict[key] = -1
+            #         elif key in ['license']:
+            #             sample_dict[key] = ['None']
+            #         else:
+            #             sample_dict[key] = 'None'
+            # yield sample_dict
 
 
 class ConcatTokensDataset(IterableDataset):
@@ -402,6 +441,20 @@ def main(args: Namespace) -> None:
         mode = ConcatMode.NO_CONCAT
         tokenizer = None
         columns = {'text': 'str'}
+        # columns = {'text': 'str', 
+        #     'repository_name': 'str', 
+        #     'path': 'str', 
+        #     'size': 'int', 
+        #     'lang': 'str', 
+        #     'ext': 'str', 
+        #     'avg_line_length': 'float32', 
+        #     'max_line_length': 'int',
+        #     'alphanum_fraction': 'float32', 
+        #     'hexsha': 'str', 
+        #     'max_stars_count': 'int',
+        #     'max_forks_count': 'int', 
+        #     'max_issues_count': 'int',
+        #     'licenses': 'json'}
 
     for split_name in args.splits:
         try:
