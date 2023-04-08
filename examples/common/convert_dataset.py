@@ -373,8 +373,8 @@ def _est_progress_denominator(total_samples: int, chars_per_sample: int,
 def build_dataloader(dataset, batch_size) -> DataLoader:
     # Multiple workers is only supported on linux machines
     if 'linux' in platform.platform().lower():
-        num_workers = min(64, dataset.hf_dataset.n_shards)  # type: ignore
-        num_workers = 32
+        #num_workers = min(64, dataset.hf_dataset.n_shards)  # type: ignore
+        num_workers = 64
     else:
         num_workers = 0
 
