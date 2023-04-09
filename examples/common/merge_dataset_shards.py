@@ -59,6 +59,20 @@ def parse_args() -> Namespace:
     )
     return args.parse_args()
 
+def with_id(basename: str, shard_id: int) -> str:
+    """Get a new basename with the given shard_id.
+
+    Args:
+        basename (str): Old basename of file.
+        shard_id (int): New shard ID.
+
+    Returns:
+        str: New basename of file.
+    """
+    parts = basename.split('.')
+    parts[1] = f'{shard_id:05}'
+    return '.'.join(parts)
+
 
 def merge_shard_groups(root: str) -> None:
     """Merge ephemeral sub-datasets created in parallel into one dataset.
