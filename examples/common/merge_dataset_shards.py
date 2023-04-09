@@ -30,7 +30,7 @@ def parse_args() -> Namespace:
     Args:
         Namespace: command-line arguments.
     """
-
+    args = ArgumentParser()
     args.add_argument(
         '--out_root',
         type=str,
